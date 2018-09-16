@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#2196f3">
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap:">
+  <title>Places Near Me</title>
+  <link rel="stylesheet" href="dist/css/framework7.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="apple-touch-icon" href="img/f7-icon-square.png">
+  <link rel="icon" href="img/f7-icon.png">
+</head>
+<body>
+  <div id="app">
+    <div class="statusbar"></div>
+    <div class="view view-main view-init ios-edges" data-url="/">
+      <div class="page">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="title">Places Near Me</div>
+          </div>
+        </div>
+        <div class="page-content">
+            <div class="list inline-labels">
+              <ul>
+                <li class="item-content item-input">
+                  <div class="item-inner">
+                    <div class="item-title item-label">Address</div>
+                    <div class="item-input-wrap">
+                      <input class="address-text" id="address" placeholder="Enter a location" type="text">
+                      <span class="input-clear-button"></span>
+                    </div>
+                  </div>
+                </li>
+                  <li class="item-content item-input">
+                  <div class="item-inner">
+                    <div class="item-title item-label">Radius</div>
+                    <div class="item-input-wrap">
+                      <input id="radius" placeholder="Radius in miles" type="text" value=5>
+                      <span class="input-clear-button"></span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+                 <div class="row">
+                    <div class="col-33">
+                        <div class="card demo-card-header-pic">
+                            <a href="#" id="bars" onclick="renderMap('bar');">
+                              <div style="background-image:url('img/bar.jpg')" class="card-header align-items-flex-end"><div class="card-headerTxt">Bars</div></div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-33">
+                            <div class="card demo-card-header-pic">
+                                <a href="#" id="restaurants" onclick="renderMap('restaurant');">
+                                  <div style="background-image:url('img/restaurant.jpg')" class="card-header align-items-flex-end"><div class="card-headerTxt">Restaurants</div></div>
+                                </a>
+                            </div>
+                    </div>
+                    <div class="col-33">
+                            <div class="card demo-card-header-pic">
+                                <a href="#" onclick="renderMap('lodging');">
+                                  <div style="background-image:url('img/hotel.jpg')" class="card-header align-items-flex-end"><div class="card-headerTxt">Hotels</div></div>
+                                </a>
+                            </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-100" id="map"></div>
+                </div>
+            
+            <div class="list">
+                <ul id="resultList">
+                    
+                </ul>
+            </div>
+        </div>
+      </div>
+    </div>
+        <script
+  src="https://code.jquery.com/jquery-1.12.4.js"
+  integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+  crossorigin="anonymous"></script>
+    
+  <script src="dist/js/framework7.js"></script>
+  <script src="js/routes.js"></script>
+
+  <script src="js/app.js"></script>
+      <script src="js/underscore.js"></script>
+    <script>
+    var map;
+    var infowindow;
+    var autocomplete;
+    //var countryRestrict = {'country': 'us'};
+    var selectedTypes = [];
+    var myLatLng = "";
+        
+           var data = JSON.parse(`{
+    "transformers": [{
+        "transformer_id":"123",
+        "loc_x":"37.4468372",
+        "loc_y":"-77.68597410000001",
+        "service_points": [{
+            "service_point":"123",
+            "outage":"Y",
+            "customers": [{
+                "CA_NM_CUST":"Subway",
+                "CA_AD_STREET_ADDR":"",
+                "CA_AD_CITY":"",
+                "CA_AD_STATE":"",
+                "CA_AD_SVC_ZIP":"",
+                "CA_AD_SVC_ZIP_SX":"",
+                "CA_ID_TRNSFMR":""
+            }]
+        }]
+    }]
+}`);
+        
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(initialize);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+    function initialize(position)
+    {
+        /* not working
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById('address')), {
+            types: ['(regions)'],
+            //componentRestrictions: countryRestrict
+        });
+        */
+        
+        var pyrmont = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        
+        myLatLng = position.coords.latitude + "," + position.coords.longitude;
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: pyrmont,
+            zoom: 15
+        });
+        
+        
+        var google_maps_geocoder = new google.maps.Geocoder();
+            google_maps_geocoder.geocode(
+                { 'latLng': pyrmont },
+                function( results, status ) {
+                    if ( status == google.maps.GeocoderStatus.OK && results[0] ) {
+                        $("#address").val( results[0].formatted_address );
+                    }
+                }
+            );
+            
+    }
+
+    function renderMap(type)
+    {
+        $("#resultList").html("");
+        
+        //call DE service 
+        //INPUT: X/Y
+        //OUTPUT: return transfomers and outages within 75 ft of X/Y
+        
+     
+        //$.getJSON( "data.json", function( data ) {
+            // Get the user defined values
+            var address = document.getElementById('address').value;
+            var radius  = parseInt(document.getElementById('radius').value) * 1000 * 0.62137;
+
+            // get the selected type
+            selectedTypes = [];
+            selectedTypes.push(type);
+
+            var geocoder    = new google.maps.Geocoder();
+            var selLocLat   = 0;
+            var selLocLng   = 0;
+        
+            //should change to this to not require geocode (check billing)
+            console.log("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+myLatLng+"&radius="+radius+"&type="+type+"&key=AIzaSyAtrPHDVVOMLbx7i0sscrUL6UAqudYBjzE");
+                
+        
+            geocoder.geocode({'address': address}, function(results, status) {
+                if (status === 'OK')
+                {
+                    selLocLat   = results[0].geometry.location.lat();
+                    selLocLng   = results[0].geometry.location.lng();
+
+                    var pyrmont = new google.maps.LatLng(selLocLat, selLocLng);
+
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: pyrmont,
+                        zoom: 15
+                    });
+
+
+                    var request = {
+                        location: pyrmont,
+                        radius: radius,
+                        types: selectedTypes,
+                        opennow: true
+                    };
+
+                    infowindow = new google.maps.InfoWindow();
+
+                    var service = new google.maps.places.PlacesService(map);
+                    service.nearbySearch(request, callback);
+                }
+                else
+                {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        //});
+        
+    }
+
+    function callback(results, status)
+    {
+        if (status == google.maps.places.PlacesServiceStatus.OK)
+        {
+            for (var i = 0; i < results.length; i++)
+            {
+                createMarker(results[i], results[i].icon);
+                console.log(results[i]);
+            }
+        }
+    }
+
+    function createMarker(place, icon) {
+        var placeLoc = place.geometry.location;
+        var latitude = place.geometry.location.lat();
+        var longitude = place.geometry.location.lng();
+        console.log(latitude);
+        console.log(longitude);
+        console.log(data.transformers.loc_x);
+        var filterList = _.filter(data.transformers, function(item){ return item.loc_x === latitude || item.loc_y === longitude; })
+
+        console.log(filterList);
+        
+        var htmlAppend = '<li><div class="item-content"><div class="item-media"><img src="'+icon+'" width=44/></i></div><div class="item-inner"><div class="item-title">'+place.name+'</div><div class="item-after"></div></div></div></li>';
+        $("#resultList").append(htmlAppend);
+        /*
+        var marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            icon: {
+                url: icon,
+                scaledSize: new google.maps.Size(20, 20) // pixels
+            },
+            animation: google.maps.Animation.DROP
+        });
+        
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent(place.name+ '<br>' +place.vicinity);
+            infowindow.open(map, this);
+        });
+        */
+    }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtrPHDVVOMLbx7i0sscrUL6UAqudYBjzE&libraries=places&callback=getLocation" async defer></script>
+</body>
+</html>

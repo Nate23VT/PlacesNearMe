@@ -1,0 +1,29 @@
+{
+	"news": [{
+		"ID": 1,
+		"Title": "Chairman's Excellence Awards",
+		"Header": "Learn more about the 2018 CEA",
+		"Description": "lorem ipsum",
+		"TitleImg": "/img/Awards2.jpg"
+	}, {
+		"ID": 2,
+		"Title": "IDeAS Challenges",
+		"Header": "Submit and collaborate on ideas",
+		"Description": "lorem ipsum2",
+		"TitleImg": "/img/collab.jpg"
+	}],
+    "stories": [{
+		"ID": 1,
+		"Title": "Case Study: LEGO",
+		"Header": "Watch an innovation case study on how lego has become the most innovative toy company in the world.",
+		"Description": "lorem ipsum",
+		"TitleImg": "/img/Lego.png"
+	}],
+    "exercises": [{
+		"ID": 1,
+		"Title": "Innovation Blender",
+		"Header": "Start your meeting with the Innovation Blender!",
+		"Description": "<p> <p><strong>Exercise Instructions</strong></p> <ol> <li>Ask the group to think of a recent purchase they love or new gift they received that they love or just their favorite product they just cant wait to tell others about. <li>Have the group divide up into pairs</li> <li>Give the pairs 5 minutes to: <ul> <li>Quickly introduce themselves to each other (if its a group of strangers)</li> <li>Share their most recent purchase or favorite new product with each</li> <li>Come up with a new product by combining their individual products together</li> </ul> </li> <li>At the end of the 5 minutes have the pairs report out by: <ul> <li>Have one person introduce the other</li> <li>Have them tell about the new product they creates together</li> </ul> </li> </ol> <p><strong>Innovation lesson</strong></p><p>Innovations (new ideas) come through combining 2 things that have never been combined before.</p> </p>",
+		"TitleImg": "/img/blender.jpg"
+	}]
+}
